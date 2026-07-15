@@ -13,7 +13,13 @@ export default function DashboardComponent() {
   const [showLatest, setShowLatest] = useState(false);
   const router = useRouter();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch: refetchContents,
+  } = useQuery({
     queryKey: ["contents"],
     enabled: !showLatest,
     refetchOnWindowFocus: false,
@@ -33,6 +39,7 @@ export default function DashboardComponent() {
     isLoading: isLatestLoading,
     isError: isLatestError,
     error: latestError,
+    refetch: refetchLatest,
   } = useQuery({
     queryKey: ["contentsLatest"],
     enabled: showLatest,
@@ -48,13 +55,21 @@ export default function DashboardComponent() {
     },
   });
 
-  console.log("data", data);
-  console.log("latestData", latestData);
-
   const loading = showLatest ? isLatestLoading : isLoading;
   const isErrored = showLatest ? isLatestError : isError;
   const errorObj = showLatest ? latestError : error;
   const items = showLatest ? latestData?.contents : data?.contents;
+
+  const handleToggle = () => {
+    const next = !showLatest;
+    setShowLatest(next);
+
+    if (next) {
+      refetchLatest();
+    } else {
+      refetchContents();
+    }
+  };
 
   const handleLogout = () => {
     Cookies.remove("token");
@@ -74,7 +89,7 @@ export default function DashboardComponent() {
           <Button
             variant="outline"
             className="mt-1 cursor-pointer"
-            onClick={() => setShowLatest(!showLatest)}
+            onClick={handleToggle}
           >
             {showLatest ? "Show All" : "Show Latest"}
           </Button>
