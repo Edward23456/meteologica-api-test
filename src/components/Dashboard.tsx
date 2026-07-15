@@ -6,9 +6,12 @@ import { useState } from "react";
 import ContentCard from "./ContentCard";
 import { Button } from "./ui/button";
 import { motion } from "motion/react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function DashboardComponent() {
   const [showLatest, setShowLatest] = useState(false);
+  const router = useRouter();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["contents"],
@@ -53,21 +56,36 @@ export default function DashboardComponent() {
   const errorObj = showLatest ? latestError : error;
   const items = showLatest ? latestData?.contents : data?.contents;
 
+  const handleLogout = () => {
+    Cookies.remove("token");
+    router.push("/login");
+  };
+
   return (
     <div className="flex flex-col w-full p-4">
       <motion.div
-        className="flex items-center gap-4"
+        className="flex items-center justify-between gap-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <span className="text-2xl font-bold">Contents</span>
+        <div className="flex items-center gap-4">
+          <span className="text-2xl font-bold">Contents</span>
+          <Button
+            variant="outline"
+            className="mt-1 cursor-pointer"
+            onClick={() => setShowLatest(!showLatest)}
+          >
+            {showLatest ? "Show All" : "Show Latest"}
+          </Button>
+        </div>
+
         <Button
           variant="outline"
-          className=" mt-1 cursor-pointer"
-          onClick={() => setShowLatest(!showLatest)}
+          className="cursor-pointer"
+          onClick={handleLogout}
         >
-          {showLatest ? "Show All" : "Show Latest"}
+          Logout
         </Button>
       </motion.div>
 

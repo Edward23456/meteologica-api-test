@@ -46,13 +46,11 @@ export default function ContentCard({
           </span>
         </CardDescription>
       </CardHeader>
-      {showLatest && (
         <CardContent className="mt-auto flex items-end justify-end">
           <Button variant="outline" className="cursor-pointer">
             View Details
           </Button>
         </CardContent>
-      )}
     </Card>
   );
 }
