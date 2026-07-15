@@ -27,10 +27,10 @@ export default function ContentCard({
       className="flex h-full w-full max-w-sm cursor-pointer flex-col"
       onClick={() => router.push(`/dashboard/${content.id}`)}
     >
-      <CardHeader className="w-[240px]">
+      <CardHeader className="w-[240px] px-4">
         <CardTitle className="w-full">
           <span className="block font-bold text-black">Title:</span>
-          <span className="mt-1 block overflow-hidden text-ellipsis whitespace-nowrap">
+          <span className="mt-1 block break-words">
             {showLatest
               ? `${contentLatest?.content_id} - `
               : content.content_name}
@@ -41,7 +41,7 @@ export default function ContentCard({
           <span className="font-bold text-black">
             {showLatest ? "Latest " : "Path:"}
           </span>
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+          <span className="break-words">
             {showLatest ? `${contentLatest?.issue_date} - ` : content.path}
           </span>
         </CardDescription>
