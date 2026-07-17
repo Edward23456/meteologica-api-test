@@ -1,13 +1,14 @@
 "use client";
 
-import { Content, ContentLatest } from "@/types/contents";
+import { Content } from "@/types/contents";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import ContentCard from "./ContentCard";
+import ContentCard from "./contents/ContentCard";
 import { Button } from "./ui/button";
 import { motion } from "motion/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import ContentTable from "./contents/ContentTabel";
 
 export default function DashboardComponent() {
   const [showLatest, setShowLatest] = useState(false);
@@ -79,33 +80,25 @@ export default function DashboardComponent() {
   return (
     <div className="flex flex-col w-full p-4">
       <motion.div
-        className="flex items-center justify-between gap-4"
+        className="flex items-center justify-between"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <div className="flex items-center gap-4">
           <span className="text-2xl font-bold">Contents</span>
-          <Button
-            variant="outline"
-            className="mt-1 cursor-pointer"
-            onClick={handleToggle}
-          >
-            {showLatest ? "Show All" : "Show Latest"}
-          </Button>
         </div>
 
         <Button
           variant="outline"
-          className="cursor-pointer"
+          className="cursor-pointer font-semibold"
           onClick={handleLogout}
         >
           Logout
         </Button>
       </motion.div>
 
-      <div className="mt-6">
-        {loading && <p>Loading...</p>}
+      <div className="mt-4">
         {isErrored && (
           <p className="text-red-500">
             {errorObj instanceof Error
@@ -114,14 +107,14 @@ export default function DashboardComponent() {
           </p>
         )}
 
-        <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
-          {!loading &&
-            !isErrored &&
-            items &&
-            (items.length === 0 ? (
-              <p>No contents available.</p>
-            ) : (
-              items.map((content: Content, index: number) => (
+        {!loading && !isErrored && items && items.length === 0 && (
+          <p>No contents available.</p>
+        )}
+
+        {!loading && !isErrored && items && items.length > 0 && (
+          <>
+            <div className="grid w-full grid-cols-1 gap-4 md:hidden">
+              {items.map((content: Content, index: number) => (
                 <motion.div
                   key={content.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -138,9 +131,23 @@ export default function DashboardComponent() {
                     contentLatest={latestData}
                   />
                 </motion.div>
-              ))
-            ))}
-        </div>
+              ))}
+            </div>
+
+            <motion.div
+              className="hidden md:block"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <ContentTable
+                items={items}
+                showLatest={showLatest}
+                contentLatest={latestData}
+              />
+            </motion.div>
+          </>
+        )}
       </div>
     </div>
   );

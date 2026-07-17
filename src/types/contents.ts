@@ -10,6 +10,15 @@ export interface ContentLatest {
   update_id: string;
 }
 
+export interface ContentUpdate {
+  issue_date: string;
+  update_id: string;
+}
+
+export interface ContentUpdatesResponse {
+  updates: ContentUpdate[];
+}
+
 export interface ContentDataRow {
   "ARPEGE RUN": string;
   "ECMWF ENS RUN": string;
@@ -19,6 +28,7 @@ export interface ContentDataRow {
   "To yyyy-mm-dd hh:mm": string;
   "UTC offset from (UTC+/-hhmm)": string;
   "UTC offset to (UTC+/-hhmm)": string;
+  forecast: string;
   perc10: string;
   perc50: string;
   perc90: string;
@@ -27,6 +37,7 @@ export interface ContentDataRow {
 export interface ContentData {
   content_id: number;
   content_name: string;
+  installed_capacity: string;
   data: ContentDataRow[];
   issue_date: string;
   timezone: string;

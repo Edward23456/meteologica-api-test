@@ -1,3 +1,4 @@
+import DashboardComponent from "@/components/Dashboard";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -9,9 +10,5 @@ export default async function Home() {
     redirect("/login");
   }
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>Welcome to the Home Page</h1>
-    </main>
-  );
+  return <DashboardComponent />;
 }

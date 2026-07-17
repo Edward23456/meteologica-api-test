@@ -29,7 +29,7 @@ export default function LoginComponent() {
         secure: true,
         sameSite: "strict",
       });
-      router.push("/dashboard");
+      router.push("/");
     },
     onError: (error) => {
       console.error("Login error:", error);
@@ -48,7 +48,7 @@ export default function LoginComponent() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <motion.h1
         className="text-3xl text-green-500 font-bold uppercase"
         initial={{ opacity: 0, y: -20 }}
@@ -113,7 +113,20 @@ export default function LoginComponent() {
                 />
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <em className="text-sm text-red-500 not-italic">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors
+                      .map((err) => {
+                        if (typeof err === "string") return err;
+                        if (
+                          err &&
+                          typeof err === "object" &&
+                          "message" in err
+                        ) {
+                          return err.message;
+                        }
+                        return null;
+                      })
+                      .filter(Boolean)
+                      .join(", ")}
                   </em>
                 )}
               </div>
@@ -158,7 +171,11 @@ export default function LoginComponent() {
                 </div>
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <em className="text-sm text-red-500 not-italic">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors
+                      .map((err) =>
+                        typeof err === "string" ? err : err?.message,
+                      )
+                      .join(", ")}
                   </em>
                 )}
               </div>
