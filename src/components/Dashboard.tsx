@@ -2,16 +2,19 @@
 
 import { Content } from "@/types/contents";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ContentCard from "./contents/ContentCard";
 import { Button } from "./ui/button";
 import { motion } from "motion/react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import ContentTable from "./contents/ContentTabel";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardComponent() {
   const [showLatest, setShowLatest] = useState(false);
+  const [isKeepingAlive, setIsKeepingAlive] = useState(false);
+  const [keepAliveMessage, setKeepAliveMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const {
@@ -77,6 +80,50 @@ export default function DashboardComponent() {
     router.push("/login");
   };
 
+  const handleKeepAlive = async () => {
+    setIsKeepingAlive(true);
+    setKeepAliveMessage(null);
+
+    try {
+      const response = await fetch("/api/keep-alive");
+      const data = await response.json();
+      console.log("Keep-alive response:", data);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to refresh token");
+      }
+
+      if (!data.data.token) {
+        throw new Error("No token returned from keep-alive request");
+      }
+
+      Cookies.set("token", data.data.token, {
+        expires: 7,
+        secure: true,
+        sameSite: "strict",
+      });
+
+      setKeepAliveMessage("Token refreshed successfully.");
+    } catch (error) {
+      console.error("Keep-alive failed:", error);
+      setKeepAliveMessage(
+        error instanceof Error ? error.message : "Failed to refresh token",
+      );
+    } finally {
+      setIsKeepingAlive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!keepAliveMessage) return;
+
+    const timeoutId = setTimeout(() => {
+      setKeepAliveMessage(null);
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [keepAliveMessage]);
+
   return (
     <div className="flex flex-col w-full p-4">
       <motion.div
@@ -89,14 +136,37 @@ export default function DashboardComponent() {
           <span className="text-2xl font-bold">Contents</span>
         </div>
 
-        <Button
-          variant="outline"
-          className="cursor-pointer font-semibold"
-          onClick={handleLogout}
-        >
-          Logout
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="cursor-pointer font-semibold"
+            onClick={handleKeepAlive}
+            disabled={isKeepingAlive}
+          >
+            {isKeepingAlive ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Keep Alive"
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            className="cursor-pointer font-semibold"
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </div>
       </motion.div>
+
+      {keepAliveMessage && (
+        <p
+          className={`mt-4 text-sm ${keepAliveMessage.includes("success") ? "text-green-600" : "text-red-500"}`}
+        >
+          {keepAliveMessage}
+        </p>
+      )}
 
       <div className="mt-4">
         {isErrored && (
