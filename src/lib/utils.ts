@@ -5,7 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const PAGE_SIZE = 20;
+
 export function parseRowDate(value: string): Date | null {
+  const parsed = new Date(value.replace(" ", "T"));
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function parseMaybeDate(value: string): Date | null {
   const parsed = new Date(value.replace(" ", "T"));
   return isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -25,7 +32,29 @@ export const MONTHS = [
   { value: "12", label: "December" },
 ];
 
+export const PRIORITY_COLUMNS = [
+  "From yyyy-mm-dd hh:mm",
+  "To yyyy-mm-dd hh:mm",
+  "forecast",
+  "perc10",
+  "perc90",
+];
+
+export const COLUMN_LABELS: Record<string, string> = {
+  "From yyyy-mm-dd hh:mm": "From",
+  "To yyyy-mm-dd hh:mm": "To",
+  forecast: "Forecast (P50)",
+  perc10: "P10",
+  perc90: "P90",
+  "UTC offset from (UTC+/-hhmm)": "UTC Offset From",
+  "UTC offset to (UTC+/-hhmm)": "UTC Offset To",
+};
+
 export const CURRENT_YEAR = new Date().getFullYear();
 export const YEARS = Array.from({ length: 10 }, (_, i) =>
   String(CURRENT_YEAR - i),
 );
+
+export const NUMERIC_COLUMNS = new Set(["forecast", "perc10", "perc90"]);
+
+export const DATE_COLUMNS = ["From yyyy-mm-dd hh:mm", "To yyyy-mm-dd hh:mm"];

@@ -2,7 +2,7 @@
 
 import { ContentData } from "@/types/contents";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import {
   Table,
@@ -24,13 +24,12 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  ArrowLeft,
 } from "lucide-react";
 import ContentIdSkeleton from "@/components/loading/ContentIdSkeleton";
 import * as XLSX from "xlsx";
-import { parseRowDate } from "@/lib/utils";
-import { DATE_COLUMNS, SortDirection, SortKey } from "@/types/sorting";
-
-const PAGE_SIZE = 20;
+import { DATE_COLUMNS, PAGE_SIZE, parseRowDate } from "@/lib/utils";
+import { SortDirection, SortKey } from "@/types/sorting";
 
 export default function ContentId() {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +38,7 @@ export default function ContentId() {
   const [toDate, setToDate] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("From yyyy-mm-dd hh:mm");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
+  const router = useRouter();
   const { data, isLoading, isError, error } = useQuery<ContentData>({
     queryKey: ["content-data", id],
     queryFn: async () => {
@@ -213,7 +212,15 @@ export default function ContentId() {
         <>
           <div className="mb-4">
             <h1 className="text-2xl font-bold">{data.content_name}</h1>
-            <div className="mt-1 flex flex-wrap gap-x-4 text-sm text-gray-500">
+            <div className="mt-1 flex flex-wrap items-center gap-x-4 text-sm text-gray-500">
+              <Button
+                variant="outline"
+                className="cursor-pointer font-semibold text-black"
+                onClick={() => router.push("/")}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to contents
+              </Button>
               <span>Issued: {data.issue_date}</span>
               <span>Timezone: {data.timezone}</span>
               <span>Unit: {data.unit}</span>
